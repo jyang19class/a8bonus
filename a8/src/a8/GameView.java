@@ -1,3 +1,4 @@
+package a8;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -31,7 +32,9 @@ public class GameView extends JPanel implements ActionListener, SpotListener{
 	private JTextField birthThresh;
 	private JTextField minSurvive;
 	private JTextField maxSurvive;
+	private JTextField delay;
 	private JLabel torusState;
+	private JLabel autoState;
 	
 	public GameView(Model model) {
 		observers = new ArrayList<Controller>();
@@ -75,7 +78,7 @@ public class GameView extends JPanel implements ActionListener, SpotListener{
 		toolsPanel.add(nextTurn, BorderLayout.SOUTH);
 		
 		JPanel moreTools = new JPanel();
-		moreTools.setLayout(new GridLayout(5,2));
+		moreTools.setLayout(new GridLayout(6,2));
 		add(moreTools, BorderLayout.EAST);
 		
 		JLabel birth = new JLabel("Set Birth Threshold");
@@ -111,6 +114,15 @@ public class GameView extends JPanel implements ActionListener, SpotListener{
 		autoRun.addActionListener(this);
 		moreTools.add(autoRun);
 		
+		autoState = new JLabel("Off");
+		moreTools.add(autoState);
+		
+		JLabel setTick = new JLabel("<html>Set delay(10 to 1000 ms)<br/>Press enter to confirm</html>");
+		moreTools.add(setTick);
+		
+		delay = new JTextField();
+		delay.addActionListener(this);
+		moreTools.add(delay);
 	}
 	
 	public void repaintBoard() {
@@ -166,6 +178,16 @@ public class GameView extends JPanel implements ActionListener, SpotListener{
 			for (Controller c : observers) {
 				c.autoRun();
 			}
+			if (autoState.getText().equals("On")) {
+				autoState.setText("Off");
+			} else {
+				autoState.setText("On");
+			}
+		} else if (e.getSource() == delay) {
+			for (Controller c : observers) {
+				c.changeDelay(Integer.parseInt(delay.getText()));
+			}
+			autoState.setText("Off");
 		}
 	}
 

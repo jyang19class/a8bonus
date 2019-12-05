@@ -1,5 +1,10 @@
+package a8;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
+import javax.swing.Timer;
 
 public class GameController implements Controller{
 	
@@ -7,14 +12,18 @@ public class GameController implements Controller{
 	Model _model;
 	ArrayList<Spot> toKill;
 	ArrayList<Spot> toBirth;
-	Thread t;
+	autoRunner t;
+	private boolean hasRunner;
+	
 	
 	public GameController(GameView view, Model model) {
 		_view = view;
 		_view.addObserver(this);
 		_model = model;
+		boolean hasRunner = false;
 		toKill = new ArrayList<Spot>();
 		toBirth = new ArrayList<Spot>();
+		t = new autoRunner(1000, this);
 	}
 
 		
@@ -292,50 +301,53 @@ public class GameController implements Controller{
 	}
 	
 	public void autoRun() {
-		boolean hasRunner = false;
-		/*if (!hasRunner) {
-			t = new autoRunner(100);
-			hasRunner = true;
+		
+		if (!t.getRunning()) {
 			t.run();
-		} else { 
-			((autoRunner) t).halt();
-			hasRunner = false;
-		}*/
-		t = new autoRunner(10, this);
-		t.run();
+		} else {
+			t.halt();
+		}
 		
 	}
 	
-	class autoRunner extends Thread {
-		private boolean done;
-		private long _delay;
+	public void changeDelay(int delay) {
+		t.halt();
+		t = new autoRunner(delay, this);
+	}
+	
+	class autoRunner extends Thread{
+		private boolean running;
+		private int _delay;
 		GameController control;
+		private Timer timer;
 		
-		public autoRunner(long delay, GameController control) {
-			done = false;
+		public autoRunner(int delay, GameController control) {
+			running = false;
 			_delay = delay;
 			this.control = control;
+			
+			timer = new Timer(_delay, new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+
+					control.nextTurn();
+					_view.repaint();
+				} 
+			});
 		}
 		public void halt() {
-			done = true;
+			timer.stop();
+			running = false;
 		}
 		public void run() {
-			
-			
-			
-			for (int i=0; i<3; i++) {
-				control.nextTurn();
-				_view.repaintBoard();
-			}
-			try {
-				Thread.sleep(_delay);
-			} catch (InterruptedException e) {
-			}
-
-
+			timer.start();
+			running = true;
 		}
-			
-			
+		
+		public boolean getRunning() {
+			return running;
 		}
+		
+	
+	}
 	
 }

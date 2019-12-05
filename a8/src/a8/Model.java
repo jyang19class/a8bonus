@@ -1,3 +1,4 @@
+package a8;
 import java.awt.Color;
 
 public class Model{

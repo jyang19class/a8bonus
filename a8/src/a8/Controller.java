@@ -1,3 +1,4 @@
+package a8;
 
 public interface Controller {
 
@@ -13,4 +14,5 @@ public interface Controller {
 	void changeMaxSurvive(int num);
 	void toggleTorus();
 	void autoRun();
+	void changeDelay(int delay);
 }
